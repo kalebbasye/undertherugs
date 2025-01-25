@@ -1,0 +1,178 @@
+html for vent art project.
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Venting Art Piece</title>
+  <style>
+    /* Basic reset */
+    html, body {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      background-color: #000;
+      overflow: hidden;
+      font-family: Georgia, serif;
+    }
+
+    /* Scene setup */
+    .scene {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      perspective: 1500px;
+      perspective-origin: center center;
+    }
+
+    /* Wall and ceiling styling */
+    .grid-room {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      perspective: 1500px;
+    }
+
+    .wall, .ceiling, .floor {
+      position: absolute;
+      width: 300%;
+      height: 300%;
+      background: linear-gradient(black 40%, transparent),
+                  repeating-linear-gradient(
+                    #fff 0px,
+                    #fff 1px,
+                    transparent 1px,
+                    transparent 40px
+                  ),
+                  repeating-linear-gradient(
+                    90deg,
+                    #fff 0px,
+                    #fff 1px,
+                    transparent 1px,
+                    transparent 40px
+                  );
+      background-size: 40px 40px;
+      animation: changeColor 10s infinite;
+    }
+
+    .floor {
+      transform: rotateX(90deg) translateZ(-300px);
+      animation: scrollGrid 4s linear infinite, changeColor 10s infinite;
+    }
+
+    .wall {
+      transform: rotateY(90deg) translateX(300px);
+      animation: scrollGridY 4s linear infinite, changeColor 10s infinite;
+    }
+
+    .ceiling {
+      transform: rotateX(-90deg) translateZ(-300px);
+      animation: scrollGrid 4s linear infinite reverse, changeColor 10s infinite;
+    }
+
+    @keyframes scrollGrid {
+      0% { background-position: 0 0; }
+      100% { background-position: 0 40px; }
+    }
+
+    @keyframes scrollGridY {
+      0% { background-position: 0 0; }
+      100% { background-position: 40px 0; }
+    }
+
+    @keyframes changeColor {
+      0% { filter: hue-rotate(0deg); }
+      100% { filter: hue-rotate(360deg); }
+    }
+
+    /* Text container */
+    .prompt-container {
+      position: absolute;
+      bottom: 60px;
+      width: 100%;
+      text-align: center;
+      font-size: 32px;
+      color: white;
+      pointer-events: none;
+    }
+
+    /* Blinking cursor */
+    .cursor {
+      display: inline-block;
+      width: 15px;
+      height: 40px;
+      background-color: white;
+      animation: blink 1s steps(2, start) infinite;
+    }
+
+    @keyframes blink {
+      0%, 50% { opacity: 1; }
+      50.1%, 100% { opacity: 0; }
+    }
+
+    /* Outgoing text */
+    .typed-line {
+      position: absolute;
+      bottom: 60px;
+      width: 100%;
+      text-align: center;
+      font-size: 32px;
+      color: white;
+      opacity: 1;
+      animation: driftAway 5s ease-out forwards;
+    }
+
+    @keyframes driftAway {
+      0% { transform: translateY(0); opacity: 1; }
+      100% { transform: translateY(-200px); opacity: 0; }
+    }
+  </style>
+</head>
+<body>
+  <div class="scene">
+    <div class="grid-room">
+      <div class="floor"></div>
+      <div class="wall"></div>
+      <div class="ceiling"></div>
+    </div>
+    <div class="prompt-container">
+      <span id="promptText"></span><span class="cursor"></span>
+    </div>
+  </div>
+
+  <script>
+    const promptText = document.getElementById('promptText');
+    let userInput = "";
+
+    document.addEventListener('keydown', (event) => {
+      if (event.key === "Enter") {
+        if (userInput.trim() !== "") {
+          // Create and animate the typed line
+          const line = document.createElement('div');
+          line.classList.add('typed-line');
+          line.textContent = userInput;
+          document.body.appendChild(line);
+
+          // Remove after animation
+          line.addEventListener('animationend', () => {
+            line.remove();
+          });
+        }
+        // Reset the input and cursor
+        userInput = "";
+      } else if (event.key === "Backspace") {
+        userInput = userInput.slice(0, -1);
+      } else if (event.key.length === 1) {
+        userInput += event.key;
+      }
+
+      promptText.textContent = userInput;
+    });
+  </script>
+</body>
+</html>
